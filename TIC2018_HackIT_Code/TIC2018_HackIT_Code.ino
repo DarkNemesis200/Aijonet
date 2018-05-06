@@ -67,11 +67,35 @@ int arrSet[] = { // array changed by IoT
   0, // question 8
   0, // question 9
   0  // question 10
-
 };
+
+char arrResponse[10];
 // <-- end of global variables and arrays -->
+
+// examples for how to POST to a webpage
+//#define SECURE_CONNECTION true
+//#define POSTEXAMPLE "User-Agent: Arduino\r\nContent-Type: application/json\r\nX-IS-AccessKey: v0NmtMreZ7ahD8db7OjOhObbQCztaEEP\r\nX-IS-BucketKey: ARKC7VQRGNSV\r\nAccept-Version: ~0\r\nContent-Length: 30\r\n\r\n{\"key\":\"pickle\",\"value\":\"3.0\"}"
+//char host[] = "httpbin.org";
+//char path[] = "/ip";
+//int port = 80;
+
+char host[] = "hackit.iotdev.telstra.com";
+char id[] = "10413"; //id may be wrong this is the device id on the telstra IoT webpage
+char tenant[] = "hackit";
+char username[] = "device";
+char password[] = "HackITdevice1";
+
+
+TelstraM1Interface commsif;
+TelstraM1Device IoTDevice(&commsif);
+Connection4G conn(true,&commsif);
+TelstraWeb WebIoT(&conn,&IoTDevice);
+TelstraIoT iotPlatform(&conn,&IoTDevice);
 OLED OLED;
+
+
 void setup() {
+  commsif.begin(); // Must include for proper SPI communication
   delay(2000);
   // put your setup code here, to run once:
   // connect to IoT and check needed hardware is ok
@@ -80,10 +104,26 @@ void setup() {
   pinMode(btnB, INPUT);
   pinMode(btnC, INPUT);
   pinMode(btnD, INPUT);
-  digitalWrite(btnA, HIGH);
-  digitalWrite(btnB, HIGH);
-  digitalWrite(btnC, HIGH);
-  digitalWrite(btnD, HIGH);
+
+//  Serial.println("Waiting until Cellular System is ready...");
+//  if(!IoTDevice.isCellularSystemReady())
+//  {
+//    Serial.println("waiting for IoTDevice ...");
+//    IoTDevice.waitUntilCellularSystemIsReady();
+//  } else {
+//    Serial.println("IoTDevice ready!");   
+//  }
+
+// code for posting to IoT
+//read credentials
+  IoTDevice.readCredentials(id,tenant,username,password);
+  
+// set credentials
+  iotPlatform.setCredentials(id,tenant,username,password,"");
+// set host
+  iotPlatform.setHost(host,443);
+  
+  conn.openTCP(host,443);
   
   //Initialize the OLED controller
   OLED.begin();
@@ -101,6 +141,23 @@ void loop() {
 //  Serial.println("loop running");
 
   questions();
+   
+
+  
+// <-- Code to post to webpage -->
+//  while(Serial.available() || (digitalRead(BUTTON)));
+//  Serial.println(" Opening TCP connection!");
+//  if(conn.openTCP(host,port)==CONNECTION4G_STATUS_OK)
+//  {
+//    Serial.println(" Success!");
+//    delay(1000);
+//    // Build HTTPS request.
+//    WebIoT.post(POSTEXAMPLE);
+//    delay(2000);
+//    conn.closeTCP();
+//    } else {
+//     Serial.println(" OpenTCP() failed.");
+//  } 
 
 }
 
@@ -127,33 +184,38 @@ void questions(){
     OLED.fill_OLED(0x00,0x00,0x00);
     OLED.drawString(arrQuestions[x], 15, 15, 255, 255, 255,1);
     delay(2000);
-    
+    while(digitalRead(btnA) == 0 || digitalRead(btnB) == 0 || digitalRead(btnC) == 0 || digitalRead(btnD) == 0){};
     response = 0;
     if(digitalRead(btnA)){response = 1;};
     if(digitalRead(btnB)){response = 2;};
     if(digitalRead(btnC)){response = 3;};
     if(digitalRead(btnD)){response = 4;};
-    };
+    
     switch (response){
     case 1:
     Serial.print("response A");
+    arrResponse[x] = 1;
     delay(1000);
     break;
     case 2:
     Serial.print("response B");
+    arrResponse[x] = 2;
     delay(1000);
     break;
     case 3:
     Serial.print("response C");
+    arrResponse[x] = 3;
     delay(1000);
     break;
     case 4:
     Serial.print("response D");
+    arrResponse[x] = 4;
     delay(1000);
     break;
     default:
     break;
-    }
+    }};
+    iotPlatform.sendMeasurement("UserInput", "UserInput", "Response", arrResponse, "");
 }
 
 void IoTquestionUpdate(){
