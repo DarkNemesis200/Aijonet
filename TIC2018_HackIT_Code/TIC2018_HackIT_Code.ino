@@ -1,76 +1,50 @@
-// <--    libraries     --> 
-#include "OLED.h"
 #include <telstraiot.h>
 #include <TelstraWeb.h>
 #include <connection4g.h>
 #include <TelstraM1Device.h>
 #include <TelstraM1Interface.h>
 #include <mqttpackets.h>
-// <-- end of libraries -->
 
-// <--    declarations     -->
-const int btnA = 2;
-const int btnB = 3;
-const int btnC = 6;
-const int btnD = 7;
-// <-- end of declarations -->
 int response = 0;
-// <--    arrays and global variables    -->
+
 // device id
 int deviceID = 000001;
+
 // all questions in an array
 String arrQuestions[] = {
-  "diarrhea", // 1
-  "constipation", // 2
-  "nausea", // 3
-  "sleep", // 4
-  "mood", // 5
-  "pain", // 6
-  "other", // 7
-  "", // 8
-  "", // 9
-  ""  // 10
+  "diarrhea",
+  "constipation",
+  "nausea",
+  "sleep",
+  "mood",
+  "pain",
+  "other",
+  "",
+  "",
+  ""
   };
-int arrLikert[] = { // 1-4 correspond to response happy -> distressed
-  1, // smiley
-  2, // neutral
-  3, // uncomfortable
-  4  // sad/ distraught
-};
+
+int arrLikert[] = {
+  // 1-4 correspond to response happy -> distressed
+  1, 2, 3, 4
+  };
+
 // possible users
 int arrUser[3] = { // array sets whether patient/ carer/ other are using device
-  0, //patient
-  1, //carer
-  2  //relative
-};
+  0, 1, 2
+  };
+
 // object to decide which questions are asked
 bool arrAsk[] = { // 1-6 are true by default
-  true,  // 1 - default
-  true,  // 2 - default
-  true,  // 3 - default
-  true,  // 4 - default
-  true,  // 5 - default
-  true,  // 6 - default
-  false, // 7
-  false, // 8
-  false, // 9
-  false  // 10
-  };
+  true, true, true, true, true, true, false, false, false, false
+};
+
 int arrSet[] = { // array changed by IoT
-  1, // question 1
-  1, // question 2
-  1, // question 3
-  1, // question 4
-  1, // question 5
-  1, // question 6
-  0, // question 7
-  0, // question 8
-  0, // question 9
-  0  // question 10
+  1, 1, 1, 1, 1, 1, 0, 0, 0, 0
 };
 
 char arrResponse[10];
-// <-- end of global variables and arrays -->
+
 
 // examples for how to POST to a webpage
 //#define SECURE_CONNECTION true
@@ -91,8 +65,6 @@ TelstraM1Device IoTDevice(&commsif);
 Connection4G conn(true,&commsif);
 TelstraWeb WebIoT(&conn,&IoTDevice);
 TelstraIoT iotPlatform(&conn,&IoTDevice);
-OLED OLED;
-
 
 void setup() {
   commsif.begin(); // Must include for proper SPI communication
@@ -111,24 +83,24 @@ void setup() {
 //    Serial.println("waiting for IoTDevice ...");
 //    IoTDevice.waitUntilCellularSystemIsReady();
 //  } else {
-//    Serial.println("IoTDevice ready!");   
+//    Serial.println("IoTDevice ready!");
 //  }
 
 // code for posting to IoT
 //read credentials
   IoTDevice.readCredentials(id,tenant,username,password);
-  
+
 // set credentials
   iotPlatform.setCredentials(id,tenant,username,password,"");
 // set host
   iotPlatform.setHost(host,443);
-  
+
   conn.openTCP(host,443);
-  
+
   //Initialize the OLED controller
   OLED.begin();
   OLED.fill_OLED(0x00,0x00,0x00); // Clear screen
-  
+
   Serial.begin(115200);
   Serial.println("Setup Finished");
 }
@@ -141,9 +113,9 @@ void loop() {
 //  Serial.println("loop running");
 
   questions();
-   
 
-  
+
+
 // <-- Code to post to webpage -->
 //  while(Serial.available() || (digitalRead(BUTTON)));
 //  Serial.println(" Opening TCP connection!");
@@ -157,7 +129,7 @@ void loop() {
 //    conn.closeTCP();
 //    } else {
 //     Serial.println(" OpenTCP() failed.");
-//  } 
+//  }
 
 }
 
@@ -169,12 +141,12 @@ void qSet(){
     } else {
       arrAsk[x] = false;
     }
-  }    
+  }
 }
 
 void questions(){
   Serial.println("questions() called");
-  // on call runs qSet() 
+  // on call runs qSet()
   // uses object from qSet() to decide which questions are asked
   qSet();
 
@@ -190,7 +162,7 @@ void questions(){
     if(digitalRead(btnB)){response = 2;};
     if(digitalRead(btnC)){response = 3;};
     if(digitalRead(btnD)){response = 4;};
-    
+
     switch (response){
     case 1:
     Serial.print("response A");
@@ -224,4 +196,3 @@ void IoTquestionUpdate(){
   // iterates through to find all questions on IoT that aren't in the local array
   // appends new questions to the local array
 }
-
