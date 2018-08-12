@@ -142,7 +142,7 @@ void loop() {
 }
 
 void Questions(String Question, int QuestionNumber) {
-    tft.fillScreen(ILI9341_WHITE)
+    tft.fillScreen(ILI9341_WHITE);
     tft.setCursor(0, 0);
     tft.setTextColor(ILI9341_BLUE);
     tft.setTextSize(2);
