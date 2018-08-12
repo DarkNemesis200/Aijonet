@@ -9,7 +9,6 @@
 #include <Adafruit_ILI9341.h>
 #include <Wire.h>
 #include <Adafruit_FT6206.h>
-
 // For the Adafruit shield, these are the default.
 #define TFT_DC 9
 #define TFT_CS 10
@@ -18,25 +17,77 @@
 
 // The FT6206 uses hardware I2C (SCL/SDA)
 Adafruit_FT6206 ctp = Adafruit_FT6206();
-
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLOCK);
-
 // If using ICSP header for SPI communication make sure ICSP jumpers on TFT shield are shorted
 // Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
-String xyCord;
 String response[] = {"null","null","null","null","null","null"};
-void questions();
+int deviceID = 000001;
 
-void setup(void) {
+// examples for how to POST to a webpage
+//#define SECURE_CONNECTION true
+//#define POSTEXAMPLE "User-Agent: Arduino\r\nContent-Type: application/json\r\nX-IS-AccessKey: v0NmtMreZ7ahD8db7OjOhObbQCztaEEP\r\nX-IS-BucketKey: ARKC7VQRGNSV\r\nAccept-Version: ~0\r\nContent-Length: 30\r\n\r\n{\"key\":\"pickle\",\"value\":\"3.0\"}"
+//char host[] = "httpbin.org";
+//char path[] = "/ip";
+//int port = 80;
+
+char host[] = "hackit.iotdev.telstra.com"; // website on telstra's network data is being posted to
+char id[] = "10413"; // change this depending on device
+char tenant[] = "hackit"; // username for account
+char username[] = "device"; // device account username
+char password[] = "HackITdevice1"; // password for device
+
+// setting up the telstra libraries
+TelstraM1Interface commsif;
+TelstraM1Device IoTDevice(&commsif);
+Connection4G conn(true,&commsif);
+TelstraWeb WebIoT(&conn,&IoTDevice);
+TelstraIoT iotPlatform(&conn,&IoTDevice);
+
+void questions();
+void setup() {
   while (!Serial);     // used for leonardo debugging
+  tft.begin(); // start the touchscreen
 
   Serial.begin(9600);
   Serial.println(F("Aijonet device activated"));
   Serial.println(" ");
   Serial.println(" ");
 
-tft.begin();
+  tft.fillScreen(ILI9341_WHITE);
+  tft.setCursor(0, 0); //need to figure out how to rotate screen
+  tft.setTextColor(ILI9341_BLACK);
+  tft.setTextSize(3);
+  tft.println("Device Activated");
+
+
+  Serial.println("Waiting until Cellular System is ready...");
+  if(!IoTDevice.isCellularSystemReady())
+  {
+    Serial.println("waiting for IoTDevice ...");
+    tft.fillScreen(ILI9341_WHITE);
+    tft.setCursor(0, 0); //need to figure out how to rotate screen
+    tft.setTextColor(ILI9341_BLACK);
+    tft.setTextSize(3);
+    tft.println("waiting for iot");
+    IoTDevice.waitUntilCellularSystemIsReady();
+  } else {
+    Serial.println("IoTDevice ready!");
+    tft.setCursor(10, 0); //need to figure out how to rotate screen
+    tft.setTextColor(ILI9341_BLACK);
+    tft.setTextSize(3);
+    tft.println("iot ready");
+  }
+ // code for posting to IoT
+ //read credentials
+   IoTDevice.readCredentials(id,tenant,username,password);
+   // set credentials
+   iotPlatform.setCredentials(id,tenant,username,password,"");
+ // set host
+   iotPlatform.setHost(host,443);
+   conn.openTCP(host,443);
+
+
 
   if (! ctp.begin(40)) {
     Serial.println("Couldn't start touchscreen");
@@ -111,4 +162,23 @@ void Questions(String Question, int QuestionNumber) {
         response[QuestionNumber - 1]  = "not ok";
       }
     }
+}
+
+void sendData () {
+  // <-- Code to post to webpage -->
+  //  while(Serial.available() || (digitalRead(BUTTON)));
+  //  Serial.println(" Opening TCP connection!");
+  //  if(conn.openTCP(host,port)==CONNECTION4G_STATUS_OK)
+  //  {
+  //    Serial.println(" Success!");
+  //    delay(1000);
+  //    // Build HTTPS request.
+  //    WebIoT.post(POSTEXAMPLE);
+  //    delay(2000);
+  //    conn.closeTCP();
+  //    } else {
+  //     Serial.println(" OpenTCP() failed.");
+  //  }
+  //iotPlatform.sendMeasurement("UserInput", "UserInput", "Response", arrResponse, "");
+
 }
