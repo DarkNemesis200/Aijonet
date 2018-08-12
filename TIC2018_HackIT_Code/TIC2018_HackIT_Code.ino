@@ -143,7 +143,7 @@ void Questions(String Question, int QuestionNumber) {
     tft.setCursor(0, 5);
     tft.setTextColor(ILI9341_BLUE);
     tft.setTextSize(2);
-    tft.println(" Please rate ")
+    tft.println(" Please rate ");
     tft.println("your " + Question);
     tft.fillCircle(60, 140, 50, ILI9341_GREEN);
     tft.fillCircle(180, 140, 50, ILI9341_YELLOW);
