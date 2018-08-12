@@ -115,10 +115,7 @@ void setup() {
      iotPlatform.setHost(host,443);
      conn.openTCP(host,443);
   }
-
-
   tft.fillScreen(ILI9341_WHITE);
-
 }
 
 void loop() {
@@ -129,12 +126,12 @@ void loop() {
     return;
   }
   delay(500);
-  Questions("Please rate your mood",1);
-  Questions("Please rate your pain",2);
-  Questions("Please rate your comfort",3);
-  Questions("Please rate your stress",4);
-  Questions("Please rate your constipation",5);
-  Questions("Please rate your diarrhea",6);
+  Questions("mood",1);
+  Questions("pain",2);
+  Questions("comfort",3);
+  Questions("stress",4);
+  Questions("constipation",5);
+  Questions("diarrhea",6);
   //Serial Print Array
   Serial.print("{");Serial.print(response[0]);Serial.print(",");Serial.print(response[1]);Serial.print(",");
   Serial.print(response[2]);Serial.print(",");Serial.print(response[3]);Serial.print(",");Serial.print(response[4]);
@@ -143,19 +140,20 @@ void loop() {
 
 void Questions(String Question, int QuestionNumber) {
     tft.fillScreen(ILI9341_WHITE);
-    tft.setCursor(0, 0);
+    tft.setCursor(0, 5);
     tft.setTextColor(ILI9341_BLUE);
     tft.setTextSize(2);
-    tft.println(Question);
-    tft.fillCircle(60, 140, 25, ILI9341_GREEN);
-    tft.fillCircle(180, 140, 25, ILI9341_YELLOW);
-    tft.fillCircle(60, 260, 25, ILI9341_MAGENTA);
-    tft.fillCircle(180, 260, 25, ILI9341_RED);
+    tft.println(" Please rate ")
+    tft.println("your " + Question);
+    tft.fillCircle(60, 140, 50, ILI9341_GREEN);
+    tft.fillCircle(180, 140, 50, ILI9341_YELLOW);
+    tft.fillCircle(60, 260, 50, ILI9341_MAGENTA);
+    tft.fillCircle(180, 260, 50, ILI9341_RED);
 
     Serial.println(Question);
     Serial.println(" ");
     Serial.println(" ");
-    if(! ctp.touched()) {
+    while(! ctp.touched()) {
       //delay(150);
       //Serial.print(". ");
     }
@@ -169,19 +167,21 @@ void Questions(String Question, int QuestionNumber) {
     r.y = map(r.y, 0, 320, 320, 0);
 
 
-    if(r.x > 120 && r.x < 240)  {
-      if(r.y > 160 && r.y < 320)  {
+    if(r.x < 120 && r.x > 240)  {
+      if(r.y > 80 && r.y < 200)  {
         response[QuestionNumber - 1] = "ok";
-      } else if(r.y < 160 || r.y > 320) {
+      } else if(r.y > 240 || r.y < 320) {
         response[QuestionNumber - 1]  = "slight discomfort";
       }
-    }else if(r.x < 120 || r.x > 240){
-      if(r.y > 160 && r.y < 320)  {
+    }else if(r.x > 120 || r.x < 240){
+      if(r.y > 80 && r.y < 200)  {
         response[QuestionNumber - 1] = "neutral";
-      } else if(r.y < 160 || r.y > 320) {
+      } else if(r.y > 240 || r.y < 320) {
         response[QuestionNumber - 1]  = "not ok";
       }
     }
+    r = null;
+    ctp.getPoint();
 }
 
 void sendData () {
