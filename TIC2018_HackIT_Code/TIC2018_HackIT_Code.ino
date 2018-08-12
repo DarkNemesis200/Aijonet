@@ -60,6 +60,7 @@ void setup() {
   tft.setTextColor(ILI9341_BLACK);
   tft.setTextSize(2);
   tft.println(" Device Activated ");
+  delay(1000);
 
   if (! ctp.begin(40)) {
     Serial.println("Couldn't start touchscreen");
@@ -67,7 +68,7 @@ void setup() {
     tft.setTextColor(ILI9341_BLACK);
     tft.setTextSize(2);
     tft.println(" couldn't start touchscreen ");
-
+    delay(500);
     while (1);
   }
 
@@ -82,6 +83,7 @@ void setup() {
   tft.setTextColor(ILI9341_BLACK);
   tft.setTextSize(2);
   tft.println(" touch to connect ");
+  delay(500);
   if ( ctp.touched()) {
     Serial.println("Waiting until Cellular System is ready...");
     if(!IoTDevice.isCellularSystemReady())
@@ -93,14 +95,8 @@ void setup() {
       tft.setTextColor(ILI9341_BLACK);
       tft.setTextSize(3);
       tft.println("waiting for iot");
-      if(timer>24000000){
-        tft.fillScreen(ILI9341_WHITE);
-        tft.setCursor(5, 0); //need to figure out how to rotate screen
-        tft.setTextColor(ILI9341_BLACK);
-        tft.setTextSize(2);
-        tft.println(" iot can't connect ");
-        return;
-      }
+      delay(500);
+      // put a delay in
       IoTDevice.waitUntilCellularSystemIsReady();
     } else {
       Serial.println("IoTDevice ready!");
@@ -108,6 +104,7 @@ void setup() {
       tft.setTextColor(ILI9341_BLACK);
       tft.setTextSize(3);
       tft.println("iot ready");
+      delay(500);
     }
    // code for posting to IoT
    //read credentials
@@ -120,7 +117,7 @@ void setup() {
   }
 
 
-  tft.fillScreen(ILI9341_BLACK);
+  tft.fillScreen(ILI9341_WHITE);
 
 }
 
@@ -145,11 +142,15 @@ void loop() {
 }
 
 void Questions(String Question, int QuestionNumber) {
-
+    tft.fillScreen(ILI9341_WHITE)
     tft.setCursor(0, 0);
-    tft.setTextColor(ILI9341_WHITE);
-    tft.setTextSize(3);
+    tft.setTextColor(ILI9341_BLUE);
+    tft.setTextSize(2);
     tft.println(Question);
+    tft.fillCircle(60, 140, 25, ILI9341_GREEN);
+    tft.fillCircle(180, 140, 25, ILI9341_YELLOW);
+    tft.fillCircle(60, 260, 25, ILI9341_MAGENTA);
+    tft.fillCircle(180, 260, 25, ILI9341_RED);
 
     Serial.println(Question);
     Serial.println(" ");
