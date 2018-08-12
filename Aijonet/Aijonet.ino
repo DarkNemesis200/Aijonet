@@ -169,10 +169,7 @@ void Questions(String Question, int QuestionNumber) {
     // flip it around to match the screen.
     r.x = map(r.x, 0, 240, 240, 0);
     r.y = map(r.y, 0, 320, 320, 0);
-    // tft.fillCircle(60, 140, 50, ILI9341_GREEN);
-    // tft.fillCircle(180, 140, 50, ILI9341_YELLOW);
-    // tft.fillCircle(60, 260, 50, ILI9341_MAGENTA);
-    // tft.fillCircle(180, 260, 50, ILI9341_RED);
+
 
     if(r.x > 120 && r.x < 240)  {
       if(r.y > 80 && r.y < 200)  {
