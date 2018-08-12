@@ -46,7 +46,7 @@ TelstraIoT iotPlatform(&conn,&IoTDevice);
 
 void questions();
 void setup() {
-  while (!Serial);     // used for leonardo debugging
+  //while (!Serial);     // used for leonardo debugging
   tft.begin(); // start the touchscreen
   tft.setRotation(2);
 
