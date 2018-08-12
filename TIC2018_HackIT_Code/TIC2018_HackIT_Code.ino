@@ -116,6 +116,10 @@ void setup() {
      conn.openTCP(host,443);
   }
   tft.fillScreen(ILI9341_WHITE);
+  tft.setCursor(0, 5);
+  tft.setTextColor(ILI9341_BLUE);
+  tft.setTextSize(2);
+  tft.println(" Touch to start");
 }
 
 void loop() {
@@ -143,8 +147,8 @@ void Questions(String Question, int QuestionNumber) {
     tft.setCursor(0, 5);
     tft.setTextColor(ILI9341_BLUE);
     tft.setTextSize(2);
-    tft.println(" Please rate ");
-    tft.println("your " + Question);
+    tft.println(" Please rate your");
+    tft.println(" " + Question);
     tft.fillCircle(60, 140, 50, ILI9341_GREEN);
     tft.fillCircle(180, 140, 50, ILI9341_YELLOW);
     tft.fillCircle(60, 260, 50, ILI9341_MAGENTA);
@@ -165,22 +169,26 @@ void Questions(String Question, int QuestionNumber) {
     // flip it around to match the screen.
     r.x = map(r.x, 0, 240, 240, 0);
     r.y = map(r.y, 0, 320, 320, 0);
+    // tft.fillCircle(60, 140, 50, ILI9341_GREEN);
+    // tft.fillCircle(180, 140, 50, ILI9341_YELLOW);
+    // tft.fillCircle(60, 260, 50, ILI9341_MAGENTA);
+    // tft.fillCircle(180, 260, 50, ILI9341_RED);
 
-
-    if(r.x < 120 && r.x > 240)  {
+    if(r.x > 120 && r.x < 240)  {
       if(r.y > 80 && r.y < 200)  {
         response[QuestionNumber - 1] = "ok";
       } else if(r.y > 240 || r.y < 320) {
         response[QuestionNumber - 1]  = "slight discomfort";
       }
-    }else if(r.x > 120 || r.x < 240){
+    }else if(r.x < 120 || r.x > 240){
       if(r.y > 80 && r.y < 200)  {
         response[QuestionNumber - 1] = "neutral";
       } else if(r.y > 240 || r.y < 320) {
         response[QuestionNumber - 1]  = "not ok";
       }
     }
-    r = null;
+    r.x = 0;
+    r.y = 0;
     ctp.getPoint();
 }
 
