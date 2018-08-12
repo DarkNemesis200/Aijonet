@@ -55,21 +55,31 @@ void setup() {
   Serial.println(" ");
 
   tft.fillScreen(ILI9341_WHITE);
-  tft.setCursor(0, 0); //need to figure out how to rotate screen
+  tft.setCursor(5, 0); //need to figure out how to rotate screen
   tft.setTextColor(ILI9341_BLACK);
-  tft.setTextSize(3);
-  tft.println("Device Activated");
+  tft.setTextSize(2);
+  tft.println(" Device Activated ");
+
 
 
   Serial.println("Waiting until Cellular System is ready...");
   if(!IoTDevice.isCellularSystemReady())
   {
+    unsigned long timer = micros();
     Serial.println("waiting for IoTDevice ...");
     tft.fillScreen(ILI9341_WHITE);
     tft.setCursor(0, 0); //need to figure out how to rotate screen
     tft.setTextColor(ILI9341_BLACK);
     tft.setTextSize(3);
     tft.println("waiting for iot");
+    if(timer>24000000){
+      tft.fillScreen(ILI9341_WHITE);
+      tft.setCursor(5, 0); //need to figure out how to rotate screen
+      tft.setTextColor(ILI9341_BLACK);
+      tft.setTextSize(2);
+      tft.println(" iot can't connect ");
+      return;
+    }
     IoTDevice.waitUntilCellularSystemIsReady();
   } else {
     Serial.println("IoTDevice ready!");
