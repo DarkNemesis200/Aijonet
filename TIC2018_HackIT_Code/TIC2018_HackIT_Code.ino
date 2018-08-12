@@ -48,6 +48,7 @@ void questions();
 void setup() {
   while (!Serial);     // used for leonardo debugging
   tft.begin(); // start the touchscreen
+  tft.setRotation(2);
 
   Serial.begin(9600);
   Serial.println(F("Aijonet device activated"));
@@ -55,52 +56,18 @@ void setup() {
   Serial.println(" ");
 
   tft.fillScreen(ILI9341_WHITE);
-  tft.setCursor(5, 0); //need to figure out how to rotate screen
+  tft.setCursor(0, 5); //need to figure out how to rotate screen
   tft.setTextColor(ILI9341_BLACK);
   tft.setTextSize(2);
   tft.println(" Device Activated ");
 
-
-
-  Serial.println("Waiting until Cellular System is ready...");
-  if(!IoTDevice.isCellularSystemReady())
-  {
-    unsigned long timer = micros();
-    Serial.println("waiting for IoTDevice ...");
-    tft.fillScreen(ILI9341_WHITE);
-    tft.setCursor(0, 0); //need to figure out how to rotate screen
-    tft.setTextColor(ILI9341_BLACK);
-    tft.setTextSize(3);
-    tft.println("waiting for iot");
-    if(timer>24000000){
-      tft.fillScreen(ILI9341_WHITE);
-      tft.setCursor(5, 0); //need to figure out how to rotate screen
-      tft.setTextColor(ILI9341_BLACK);
-      tft.setTextSize(2);
-      tft.println(" iot can't connect ");
-      return;
-    }
-    IoTDevice.waitUntilCellularSystemIsReady();
-  } else {
-    Serial.println("IoTDevice ready!");
-    tft.setCursor(10, 0); //need to figure out how to rotate screen
-    tft.setTextColor(ILI9341_BLACK);
-    tft.setTextSize(3);
-    tft.println("iot ready");
-  }
- // code for posting to IoT
- //read credentials
-   IoTDevice.readCredentials(id,tenant,username,password);
-   // set credentials
-   iotPlatform.setCredentials(id,tenant,username,password,"");
- // set host
-   iotPlatform.setHost(host,443);
-   conn.openTCP(host,443);
-
-
-
   if (! ctp.begin(40)) {
     Serial.println("Couldn't start touchscreen");
+    tft.setCursor(0, 25); //need to figure out how to rotate screen
+    tft.setTextColor(ILI9341_BLACK);
+    tft.setTextSize(2);
+    tft.println(" couldn't start touchscreen ");
+
     while (1);
   }
 
@@ -109,6 +76,48 @@ void setup() {
   Serial.println(" ");
   Serial.println(" ");
   Serial.println("waiting for user........");
+
+  tft.fillScreen(ILI9341_WHITE);
+  tft.setCursor(0, 5); //need to figure out how to rotate screen
+  tft.setTextColor(ILI9341_BLACK);
+  tft.setTextSize(2);
+  tft.println(" touch to connect ");
+  if ( ctp.touched()) {
+    Serial.println("Waiting until Cellular System is ready...");
+    if(!IoTDevice.isCellularSystemReady())
+    {
+      unsigned long timer = micros();
+      Serial.println("waiting for IoTDevice ...");
+      tft.fillScreen(ILI9341_WHITE);
+      tft.setCursor(0, 0); //need to figure out how to rotate screen
+      tft.setTextColor(ILI9341_BLACK);
+      tft.setTextSize(3);
+      tft.println("waiting for iot");
+      if(timer>24000000){
+        tft.fillScreen(ILI9341_WHITE);
+        tft.setCursor(5, 0); //need to figure out how to rotate screen
+        tft.setTextColor(ILI9341_BLACK);
+        tft.setTextSize(2);
+        tft.println(" iot can't connect ");
+        return;
+      }
+      IoTDevice.waitUntilCellularSystemIsReady();
+    } else {
+      Serial.println("IoTDevice ready!");
+      tft.setCursor(10, 0); //need to figure out how to rotate screen
+      tft.setTextColor(ILI9341_BLACK);
+      tft.setTextSize(3);
+      tft.println("iot ready");
+    }
+   // code for posting to IoT
+   //read credentials
+     IoTDevice.readCredentials(id,tenant,username,password);
+     // set credentials
+     iotPlatform.setCredentials(id,tenant,username,password,"");
+   // set host
+     iotPlatform.setHost(host,443);
+     conn.openTCP(host,443);
+  }
 
 
   tft.fillScreen(ILI9341_BLACK);
